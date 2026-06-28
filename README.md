@@ -15,7 +15,12 @@ The ***ARM SYSTEM*** button will turn on actual motion detection and logging. Mo
 The ***Clear all media*** button will remove all images and videos, this is if you know nothing of interest has taken place while the program was on
 The ***Toggle Camera*** button will change between cameras, upto 3 of them.  
 Note that it may take some time for the GUI window to open.
+Please ensure all cameras to be used are connected and not already in use **before** starting the program, and **toggle the camera** to "camera in use: 1" before clicking arm system.
 ## ToDo
 To add preview for camera so you know which one is in use. *(The code for this is done, yet to implement)*
 To double check if openCV's CAP_MSMF works in other operating systems apart from windows
 To add functionality for masking (adding black boxes in areas where we dont want to detect motion) *(The code for this is done, yet to implement)*
+
+##Update
+While this is meant to be used with a real modern camera (most almost always use windows MSMF backend), virtual cameras are known not to be exposed to its device enumeration properly. Therefore i switched back to DSHOW and added MSMF as a fallback, so virtual cameras like OBS's virtual camera should be detected. (Only tested using droidcam, but it should work). Sorry shipwrighters, never occured to me that people testing this would defo not want to use their own camera due to privacy :(
+
