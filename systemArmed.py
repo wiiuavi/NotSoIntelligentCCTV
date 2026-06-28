@@ -23,19 +23,38 @@ THRESHOLD = 15.0    #will inc or dec when testing diff door open/close
 keep_running = True  # Flag to control main loop
 camToUse = 0
 
-def init_camera(camToUse): #fixes issue where camera was reopened each time image was taken, which didnt meet the "change sensitivity req)"
-    cap = cv2.VideoCapture(camToUse, cv2.CAP_MSMF)
-    if not cap.isOpened():
-        print("Error: Could not open webcam.")
-        return None
+def _backend_name(backend):
+    names = {
+        cv2.CAP_MSMF: "MSMF", #now looping thru diff backends, not js using this one, while program was intended to be used with a modern webcam (which nearly all support MSMF) virtual webcams tend to support DSHOW better
+        cv2.CAP_DSHOW: "DSHOW",
+        cv2.CAP_ANY: "ANY"
+    }
+    return names.get(backend, str(backend))
 
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
-    for _ in range(5):
-        cap.read()
+def init_camera(camToUse): # fixes issue where camera was reopened each time image was taken, which didnt meet the "change sensitivity req)"
+    backends = [cv2.CAP_DSHOW, cv2.CAP_MSMF]
 
-    return cap
+    for backend in backends:
+        cap = cv2.VideoCapture(camToUse, backend)
+        if cap.isOpened():
+            print(f"Opened camera {camToUse} with {_backend_name(backend)}")
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+            for _ in range(5):
+                cap.read()
+
+            return cap
+
+        print(f"Warning: could not open camera {camToUse} with {_backend_name(backend)}")
+        try:
+            cap.release()
+        except Exception:
+            pass
+
+    print("Error: Could not open webcam with available method/backend.")
+    return None
 
 
 def capture_image(cap, filename):
